@@ -1,0 +1,14 @@
+[package]
+name = "rust"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "rblaidd"
+crate-type = ["cdylib"]
+
+[dependencies]
+
+[dependencies.pyo3]
+version = "0.18.0"
+features = ["abi3-py37"]

@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "narwhals>=2.1.1",
+    "numpy>=2.3.2",
     "polars>=1.31.0",
 ]
 
@@ -13,3 +14,10 @@ dependencies = [
 dev = [
     "matplotlib>=3.10.3",
 ]
+
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
