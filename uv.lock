@@ -4,9 +4,10 @@ requires-python = ">=3.11"
 [[package]]
 name = "blaidd"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "narwhals" },
+    { name = "numpy" },
     { name = "polars" },
 ]
 
@@ -18,6 +19,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "narwhals", specifier = ">=2.1.1" },
+    { name = "numpy", specifier = ">=2.3.2" },
     { name = "polars", specifier = ">=1.31.0" },
 ]
 
