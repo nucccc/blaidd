@@ -8,6 +8,7 @@ name = "rblaidd"
 crate-type = ["cdylib"]
 
 [dependencies]
+rand = "0.9.2"
 
 [dependencies.pyo3]
 version = "0.18.0"
