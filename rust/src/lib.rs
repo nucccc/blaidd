@@ -1,7 +1,10 @@
+use rand::rng;
+use rand::seq::SliceRandom;
+
 use pyo3::prelude::*;
-use pyo3::types::{PyList, PyTuple};
 
 
+#[derive(Clone)]
 pub struct Graph {
     nodes: Vec<Node>
 }
@@ -16,11 +19,16 @@ impl Graph {
         
         Self { nodes: nodes }
     }
+
+    fn get_n_centroids(&self) -> usize {
+        self.nodes.len()
+    }
 }
 
+#[derive(Clone)]
 pub struct Node {
     connecteds: Vec<usize>,
-    color: Option<f64>, // maybe not option at a point, like let's say we'll have -1
+    color: f64, // maybe not option at a point, like let's say we'll have -1
 }
 
 impl Node {
@@ -35,7 +43,7 @@ impl Node {
             }
         }
 
-        Self { connecteds: connecteds, color: Some(-1.0) }
+        Self { connecteds: connecteds, color: -1.0 }
     }
 }
 
@@ -56,13 +64,46 @@ fn create_scale(n_centroids: usize) -> Vec<f64> {
 }
 
 
+struct Bee {
+    graph: Graph,
+    fitness: f64,
+    no_improv: u32,
+    scale: Vec<f64>,
+}
 
+impl Bee {
+    fn new(graph: Graph) -> Self {
+        let scale = create_scale(graph.get_n_centroids());
+
+        let mut bee = Bee{
+            graph: graph,
+            fitness: 0.0,
+            no_improv: 0,
+            scale: scale,
+        };
+
+        bee.reset();
+
+        bee
+    }
+
+    fn reset(&mut self, ) {
+        self.scale.shuffle(&mut rng());
+        /*for i in 0.. {
+            node.color = self.scale[i]
+        }*/
+        for (node, color) in self.graph.nodes.iter_mut().zip(self.scale.iter()) {
+            node.color = *color
+        }
+    }
+}
 
 
 #[pyfunction]
 pub fn abc(
     n_centroids: usize,
-    edges: Vec<(usize, usize)>
+    edges: Vec<(usize, usize)>,
+    n_bees: usize,
 ) {
     println!("hello from abc");
     println!("{:?}", edges);
@@ -70,6 +111,12 @@ pub fn abc(
     let mut graph = Graph::new(n_centroids, &edges);
 
     let scale = create_scale(n_centroids);
+
+    let mut bees: Vec<Bee> = Vec::new();
+
+    for _ in 0..n_bees {
+        bees.push(Bee::new(graph.clone()));
+    } 
 
 
 }
