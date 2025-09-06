@@ -4,6 +4,9 @@ use rand::seq::SliceRandom;
 use pyo3::prelude::*;
 
 
+type Solution = Vec<f64>;
+
+
 #[derive(Clone)]
 pub struct Graph {
     nodes: Vec<Node>
@@ -28,7 +31,6 @@ impl Graph {
 #[derive(Clone)]
 pub struct Node {
     connecteds: Vec<usize>,
-    color: f64, // maybe not option at a point, like let's say we'll have -1
 }
 
 impl Node {
@@ -43,12 +45,12 @@ impl Node {
             }
         }
 
-        Self { connecteds: connecteds, color: -1.0 }
+        Self { connecteds: connecteds }
     }
 }
 
 
-fn create_scale(n_centroids: usize) -> Vec<f64> {
+fn create_scale(n_centroids: usize) -> Solution {
     // TODO: test this
     let mut res = Vec::new();
     res.reserve(n_centroids);
@@ -68,33 +70,52 @@ struct Bee {
     graph: Graph,
     fitness: f64,
     no_improv: u32,
-    scale: Vec<f64>,
+    solution: Solution,
+}
+
+/*  max_diff suppesed to be between 0.0 and 1.0 */
+fn calc_fitness(graph: &Graph, solution: &Solution, max_diff: f64) -> f64 {
+    let mut fitness = 0.0;
+
+    for (i, node) in graph.nodes.iter().enumerate() {
+        if ! node.connecteds.is_empty() {
+            let mut node_score = 0.0;
+            for j in &node.connecteds {
+                let diff = (solution[i] - solution[*j]).abs();
+                let diff_norm = f64::min(diff, max_diff);
+                node_score += diff_norm.powi(2)
+            }
+            fitness += node_score / (node.connecteds.len() as f64);
+        }        
+    }
+    fitness = fitness / (graph.nodes.len() as f64);
+
+    fitness
 }
 
 impl Bee {
     fn new(graph: Graph) -> Self {
+        // instantiating a scale, which will be the solution
         let scale = create_scale(graph.get_n_centroids());
 
         let mut bee = Bee{
             graph: graph,
             fitness: 0.0,
             no_improv: 0,
-            scale: scale,
+            solution: scale,
         };
 
+        // resetting in order for the solution to be randomized
         bee.reset();
 
         bee
     }
 
-    fn reset(&mut self, ) {
-        self.scale.shuffle(&mut rng());
-        /*for i in 0.. {
-            node.color = self.scale[i]
-        }*/
-        for (node, color) in self.graph.nodes.iter_mut().zip(self.scale.iter()) {
-            node.color = *color
-        }
+    fn reset(&mut self) {
+        self.solution.shuffle(&mut rng());
+
+        self.no_improv = 0;
+        self.fitness = calc_fitness(&self.graph, &self.solution, 1.0); // TODO: max_diff from parameter
     }
 }
 
