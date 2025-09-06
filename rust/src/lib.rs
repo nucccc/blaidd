@@ -69,8 +69,10 @@ fn create_scale(n_centroids: usize) -> Solution {
 struct Bee {
     graph: Graph,
     fitness: f64,
-    no_improv: u32,
+    n_stuck: u32,
+    max_stuck: u32,
     solution: Solution,
+    max_diff: f64,
 }
 
 /*  max_diff suppesed to be between 0.0 and 1.0 */
@@ -93,16 +95,33 @@ fn calc_fitness(graph: &Graph, solution: &Solution, max_diff: f64) -> f64 {
     fitness
 }
 
+fn gen_perm(max_val: usize) -> (usize, usize) {
+    let i = rand::random_range(..max_val);
+    let mut j = rand::random_range(..max_val);
+
+    while i == j {
+        j = rand::random_range(..max_val);
+    }
+
+    (i, j)
+}
+
+fn gen_perms(n_perms: usize, max_val: usize) -> Vec<(usize, usize)> {
+    (0..n_perms).map(|_| gen_perm(max_val)).collect()
+}
+
 impl Bee {
-    fn new(graph: Graph) -> Self {
+    fn new(graph: Graph, max_diff: f64, max_stuck: u32) -> Self {
         // instantiating a scale, which will be the solution
         let scale = create_scale(graph.get_n_centroids());
 
         let mut bee = Bee{
             graph: graph,
             fitness: 0.0,
-            no_improv: 0,
+            n_stuck: 0,
+            max_stuck: max_stuck,
             solution: scale,
+            max_diff: max_diff,
         };
 
         // resetting in order for the solution to be randomized
@@ -114,8 +133,44 @@ impl Bee {
     fn reset(&mut self) {
         self.solution.shuffle(&mut rng());
 
-        self.no_improv = 0;
-        self.fitness = calc_fitness(&self.graph, &self.solution, 1.0); // TODO: max_diff from parameter
+        self.n_stuck = 0;
+        self.fitness = calc_fitness(&self.graph, &self.solution, self.max_diff);
+    }
+
+    fn iterate(&mut self, n_perms: usize) {
+        // TODO: this could become an internal array at a point for performance reasons
+        let perms = gen_perms(n_perms, self.solution.len());
+    
+        self.apply_perms(&perms);
+
+        let new_fitness = calc_fitness(&self.graph, &self.solution, self.max_diff)
+        if new_fitness < self.fitness {
+            self.fitness = new_fitness;
+            self.n_stuck = 0;
+        } else {
+            self.n_stuck += 1;
+            if self.n_stuck >= self.max_stuck {
+                self.reset();
+            } else {
+                self.reset_perms(&perms);
+            }
+        }
+    }
+
+    fn apply_perms(&mut self, perms: &Vec<(usize, usize)>) {
+        for perm in perms {
+            let c = self.solution[perm.0];
+            self.solution[perm.0] = self.solution[perm.1];
+            self.solution[perm.1] = c;
+        }
+    }
+
+    fn reset_perms(&mut self, perms: &Vec<(usize, usize)>) {
+        for perm in perms.iter().rev() {
+            let c = self.solution[perm.0];
+            self.solution[perm.0] = self.solution[perm.1];
+            self.solution[perm.1] = c;
+        }
     }
 }
 
@@ -129,14 +184,17 @@ pub fn abc(
     println!("hello from abc");
     println!("{:?}", edges);
 
-    let mut graph = Graph::new(n_centroids, &edges);
-
-    let scale = create_scale(n_centroids);
+    // TODO: this shall be passed with references at a point
+    let graph = Graph::new(n_centroids, &edges);
 
     let mut bees: Vec<Bee> = Vec::new();
 
     for _ in 0..n_bees {
-        bees.push(Bee::new(graph.clone()));
+        bees.push(Bee::new(
+            graph.clone(),
+            0.25,
+            50
+        ));
     } 
 
 
