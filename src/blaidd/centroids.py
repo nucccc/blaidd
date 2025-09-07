@@ -1,3 +1,5 @@
+from typing import Any
+
 import narwhals as nw
 import numpy as np
 import numpy.typing as npt
@@ -10,7 +12,7 @@ def calc_centroids(
     x_col: str,
     y_col: str,
     label_col: str,
-) -> tuple[list[str], npt.ArrayLike]:
+) -> tuple[list[Any], npt.ArrayLike]:
     ndf = nw.from_native(df)
     centroid_rows: list[list[float]] = list()
     labels = list()
