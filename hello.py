@@ -8,8 +8,9 @@
 
 
 """"""
-from blaidd import color_series, color_series_with_bees, new_stuff
-from src import blaidd
+from random import shuffle
+
+import blaidd
 
 import numpy as np
 import polars as pl
@@ -39,6 +40,9 @@ def build_reticulate(
     ret_size: int = 100,
     ret_var: float = 0.2,
 ) -> pl.DataFrame:
+    cats = [i for i in range(nx * ny)]
+    shuffle(cats)
+
     xs: list[np.array] = list()
     ys: list[np.array] = list()
     cs: list[np.array] = list()
@@ -46,7 +50,7 @@ def build_reticulate(
         for j in range(nx):
             xs.append(np.random.randn(ret_size) * ret_var + i)
             ys.append(np.random.randn(ret_size) * ret_var + j)
-            cs.append(np.ones(ret_size, dtype=np.uint8) * (i*ny + j))
+            cs.append(np.ones(ret_size, dtype=np.uint8) * cats[(i*nx + j)])
     x = np.concat(xs)
     y = np.concat(ys)
     c = np.concat(cs)
@@ -86,6 +90,14 @@ if __name__ == '__main__':
             'c'
         )
     )
+
+    plt.scatter(
+        x = df['x'],
+        y = df['y'],
+        c = df['c'],
+        s = 4
+    )
+    plt.show()
 
     plt.scatter(
         x = df['x'],
