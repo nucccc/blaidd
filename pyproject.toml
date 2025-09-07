@@ -1,7 +1,7 @@
 [project]
 name = "blaidd"
 version = "0.1.0"
-description = "Add your description here"
+description = "Helper to color scatterplots with labels"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -20,4 +20,6 @@ requires = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"
 
 [tool.maturin]
+python-source = "src"
+module-name = "blaidd._core"
 features = ["pyo3/extension-module"]
