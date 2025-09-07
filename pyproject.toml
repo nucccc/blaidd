@@ -20,6 +20,5 @@ requires = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"
 
 [tool.maturin]
-python-source = "src"
-module-name = "blaidd._core"
+module-name = "blaidd._rblaidd"
 features = ["pyo3/extension-module"]

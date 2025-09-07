@@ -9,4 +9,6 @@ wheels/
 # Virtual environments
 .venv
 
-rust/target/*
+.python-version
+blaidd/_rblaidd.abi3.so
+target/

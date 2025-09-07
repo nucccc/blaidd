@@ -6,7 +6,7 @@ from numpy import typing as npt
 from .centroids import calc_centroids
 from .graph import seek_valid_edges
 
-from rblaidd import rblaidd
+from ._rblaidd import abc
 
 def color_df(
     native_df: IntoFrame,
@@ -33,7 +33,7 @@ def color_df(
 
     edges = seek_valid_edges(centroids)
     
-    centroid_colors = rblaidd.abc(len(centroids), edges, 50, 10000)
+    centroid_colors = abc(len(centroids), edges, 50, 10000)
 
     centroid_index_by_val = {
         label:i
