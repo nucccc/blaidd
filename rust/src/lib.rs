@@ -182,9 +182,6 @@ pub fn abc(
     n_bees: usize,
     n_iter: usize, // TODO: this could become a time thing at a point
 ) -> Solution {
-    println!("hello from abc");
-    println!("{:?}", edges);
-
     // TODO: this shall become a parameter with a default
     let n_perms: usize = 1;
 
