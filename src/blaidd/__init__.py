@@ -31,5 +31,7 @@ def color_df(
 
     edges = seek_valid_edges(centroids)
     
-    rblaidd.abc()
+    # TODO: this still needs to be distributed across all
+    # rows by label
+    return rblaidd.abc(len(centroids), edges, 50, 1000)
 
