@@ -1,4 +1,15 @@
+
+
+
+
+
+
+
+
+
+""""""
 from blaidd import color_series, color_series_with_bees, new_stuff
+from src import blaidd
 
 import numpy as np
 import polars as pl
@@ -68,11 +79,11 @@ if __name__ == '__main__':
     plt.show()"""
 
     df = df.with_columns(
-        color_series_with_bees(
-            df=df,
-            x_col='x',
-            y_col='y',
-            c_col='c',
+        color_graphed=blaidd.color_df(
+            df,
+            'x',
+            'y',
+            'c'
         )
     )
 
