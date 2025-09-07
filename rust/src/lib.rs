@@ -144,7 +144,7 @@ impl Bee {
         self.apply_perms(&perms);
 
         let new_fitness = calc_fitness(&self.graph, &self.solution, self.max_diff);
-        if new_fitness < self.fitness {
+        if new_fitness > self.fitness {
             self.fitness = new_fitness;
             self.n_stuck = 0;
         } else {
@@ -188,8 +188,8 @@ pub fn abc(
     // TODO: this shall become a parameter with a default
     let n_perms: usize = 1;
 
-    let mut best_fitness: f64 = 0.0;
-    let mut best_solution: Solution = Vec::new();
+    let mut best_fitness: f64;
+    let mut best_solution: Solution;
 
     // TODO: this shall be passed with references at a point
     let graph = Graph::new(n_centroids, &edges);
@@ -219,8 +219,8 @@ pub fn abc(
         }
         // selecting best solution
         for bee in bees.iter() {
-            // this is a minimization problem
-            if best_fitness > bee.fitness {
+            // this is a maximization problem
+            if best_fitness < bee.fitness {
                 best_solution = bee.solution.clone();
                 best_fitness = bee.fitness
             }

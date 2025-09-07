@@ -18,7 +18,7 @@ def seek_valid_edges(centroids: npt.NDArray[np.float64]) -> list[tuple[int, int]
     return [
         (i, j)
         for i in range(centroids.shape[0])
-        for j in range(i, centroids.shape[0])
+        for j in range(i + 1, centroids.shape[0])
         if is_edge_valid(i, j, centroids)
     ]
 
@@ -28,6 +28,10 @@ def is_edge_valid(
     j: int,
     centroids: npt.NDArray[np.float64],
 ) -> bool:
+    
+    # TODO: for now the valid edge stuff is based on a circle, it would be
+    # cool to use an ellypsis to actually have a more parametric approach to the plot
+
     ray = dist2d(centroids[i], centroids[j]) / 2
     center = (centroids[i] + centroids[j]) / 2
 

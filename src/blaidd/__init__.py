@@ -1,5 +1,7 @@
 import narwhals as nw
+import numpy as np
 from narwhals.typing import IntoFrame
+from numpy import typing as npt
 
 from .centroids import calc_centroids
 from .graph import seek_valid_edges
@@ -11,7 +13,7 @@ def color_df(
     x_col: str,
     y_col: str,
     label_col: str,
-) -> list[int]:
+) -> npt.ArrayLike:
     df = nw.from_native(native_df)
 
     centroid_rows: list[list[float]] = list()
@@ -31,7 +33,12 @@ def color_df(
 
     edges = seek_valid_edges(centroids)
     
-    # TODO: this still needs to be distributed across all
-    # rows by label
-    return rblaidd.abc(len(centroids), edges, 50, 1000)
+    centroid_colors = rblaidd.abc(len(centroids), edges, 50, 10000)
+
+    centroid_index_by_val = {
+        label:i
+        for i, label in enumerate(labels)
+    }
+
+    return np.array([centroid_colors[ centroid_index_by_val[label] ] for label in df[label_col] ])
 
